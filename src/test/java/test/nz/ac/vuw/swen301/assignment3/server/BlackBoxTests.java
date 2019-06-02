@@ -19,7 +19,8 @@ public class BlackBoxTests {
     private static final String TEST_HOST = "localhost";
     private static final int TEST_PORT = 8080;
     private static final String TEST_PATH = "/resthome4logs"; // as defined in pom.xml
-    private static final String SERVICE_PATH = TEST_PATH + "/logs"; // as defined in pom.xml and web.xml
+    private static final String LOGS_PATH = TEST_PATH + "/logs"; // as defined in pom.xml and web.xml
+    private static final String STATS_PATH = TEST_PATH + "/stats";
 
     //HELPER METHODS
     @BeforeClass
@@ -66,7 +67,7 @@ public class BlackBoxTests {
     public void LOGSGETtestValidRequestResponseCode () throws Exception {
         Assume.assumeTrue(isServerReady());
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(SERVICE_PATH)
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
                 .setParameter("limit", "10")
                 .addParameter("level","DEBUG");
         URI uri = builder.build();
@@ -80,7 +81,7 @@ public class BlackBoxTests {
         Assume.assumeTrue(isServerReady());
         URIBuilder builder = new URIBuilder();
         // query parameter missing
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(SERVICE_PATH);
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH);
         URI uri = builder.build();
         HttpResponse response = get(uri);
 
@@ -92,7 +93,7 @@ public class BlackBoxTests {
         Assume.assumeTrue(isServerReady());
         URIBuilder builder = new URIBuilder();
         // wrong query parameter name
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(SERVICE_PATH)
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
                 .setParameter("invalidkey","J");
         URI uri = builder.build();
         HttpResponse response = get(uri);
@@ -104,7 +105,7 @@ public class BlackBoxTests {
     public void LOGSGETtestValidContentType () throws Exception {
         Assume.assumeTrue(isServerReady());
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(SERVICE_PATH)
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
                 .setParameter("limit","5")
                 .addParameter("level","ERROR");
         URI uri = builder.build();
@@ -120,7 +121,7 @@ public class BlackBoxTests {
     public void LOGSGETtestReturnedValues () throws Exception {
         Assume.assumeTrue(isServerReady());
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(SERVICE_PATH)
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
                 .setParameter("limit","3")
                 .addParameter("level","DEBUG");
         URI uri = builder.build();
@@ -152,7 +153,7 @@ public class BlackBoxTests {
                 "  }\n" +
                 "]";
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(SERVICE_PATH)
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
                 .setParameter("LogEvent", logevent);
         URI uri = builder.build();
         HttpResponse response = get(uri);
@@ -165,7 +166,7 @@ public class BlackBoxTests {
         Assume.assumeTrue(isServerReady());
         URIBuilder builder = new URIBuilder();
         // query parameter missing
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(SERVICE_PATH);
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH);
         URI uri = builder.build();
         HttpResponse response = get(uri);
 
@@ -177,7 +178,7 @@ public class BlackBoxTests {
         Assume.assumeTrue(isServerReady());
         URIBuilder builder = new URIBuilder();
         // wrong query parameter name
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(SERVICE_PATH)
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
                 .setParameter("invalidkey","J");
         URI uri = builder.build();
         HttpResponse response = get(uri);
@@ -200,7 +201,7 @@ public class BlackBoxTests {
                 "  }\n" +
                 "]";
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(SERVICE_PATH)
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
                 .setParameter("LogEvent", logevent);
         URI uri = builder.build();
         HttpResponse response = get(uri);
@@ -226,7 +227,7 @@ public class BlackBoxTests {
                 "  }\n" +
                 "]";
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(SERVICE_PATH)
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
                 .setParameter("LogEvent", logevent);
         URI uri = builder.build();
         HttpResponse response = get(uri);
@@ -246,7 +247,7 @@ public class BlackBoxTests {
     public void STATSGETtestValidRequestResponseCode () throws Exception {
         Assume.assumeTrue(isServerReady());
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(SERVICE_PATH);
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(STATS_PATH);
         URI uri = builder.build();
         HttpResponse response = get(uri);
 
@@ -257,7 +258,7 @@ public class BlackBoxTests {
     public void STATSGETtestValidContentType () throws Exception {
         Assume.assumeTrue(isServerReady());
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(SERVICE_PATH);
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(STATS_PATH);
         URI uri = builder.build();
         HttpResponse response = get(uri);
 
@@ -271,7 +272,7 @@ public class BlackBoxTests {
     public void STATSGETtestReturnedValues () throws Exception {
         Assume.assumeTrue(isServerReady());
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(SERVICE_PATH);
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(STATS_PATH);
         URI uri = builder.build();
         HttpResponse response = get(uri);
 
