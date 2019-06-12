@@ -10,16 +10,10 @@ public class StatsServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/html");
+        response.setContentType("application/vnd.ms-excel");
         PrintWriter out = response.getWriter();
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<title>Get Logs</title>");
-        out.println("</head>");
-        out.println("<body>");
-        out.println("</body>");
-        out.println("</html>");
 
+        response.setStatus(200);
         out.close();
     }
 }
