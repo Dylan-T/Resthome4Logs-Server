@@ -1,6 +1,9 @@
 package nz.ac.vuw.swen301.assignment3.server;
 
 import com.google.gson.Gson;
+import com.sun.javafx.util.Logging;
+import org.apache.log4j.Priority;
+import org.apache.log4j.spi.LoggingEvent;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -12,7 +15,7 @@ import java.util.List;
 
 public class LogsServlet extends HttpServlet {
 
-    private static List<String> logs = new ArrayList<String>();
+    public static List<LoggingEvent> logs = new ArrayList<LoggingEvent>();
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -22,13 +25,13 @@ public class LogsServlet extends HttpServlet {
         if(request.getParameter("limit") == null || request.getParameter("level") == null){
             response.setStatus(400);
         }else {
-            List<String> responseLogs = new ArrayList<String>();
+            List<LoggingEvent> responseLogs = new ArrayList<LoggingEvent>();
             int limit = Integer.parseInt(request.getParameter("limit"));
             String level = request.getParameter("level");
             // get logs in order of timestamp
             int counter = 0;
-            for (String log : logs) {
-                if (log.contains("\"level\" \"" + level + "\"")) { // TODO: See if log meets level
+            for (LoggingEvent log : logs) {
+                if (log.getLevel().toInt() <= Priority.toPriority(request.getParameter("level")).toInt()) {
                     responseLogs.add(log);
                     counter++;
                 }
@@ -51,6 +54,6 @@ public class LogsServlet extends HttpServlet {
         }
 
         response.setStatus(201);
-        logs.add(request.getParameter("LogEvent"));
+        logs.add(new Gson().fromJson(request.getParameter("LogEvent"), LoggingEvent.class));
     }
 }
