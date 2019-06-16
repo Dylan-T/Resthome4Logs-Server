@@ -14,7 +14,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>StatsServlet</servlet-name>
-        <servlet-class>nz.ac.vuw.swen301.assignment3.server.LogsServlet</servlet-class>
+        <servlet-class>nz.ac.vuw.swen301.assignment3.server.StatsServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>StatsServlet</servlet-name>

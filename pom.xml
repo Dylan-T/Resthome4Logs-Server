@@ -75,7 +75,7 @@
                 <configuration>
                     <scanIntervalSeconds>10</scanIntervalSeconds>
                     <webApp>
-                        <contextPath>/webapp</contextPath>
+                        <contextPath>/resthome4logs</contextPath>
                     </webApp>
                 </configuration>
             </plugin>

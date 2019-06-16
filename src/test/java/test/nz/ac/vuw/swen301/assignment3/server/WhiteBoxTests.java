@@ -1,11 +1,15 @@
 package test.nz.ac.vuw.swen301.assignment3.server;
 
+import nz.ac.vuw.swen301.assignment3.server.LogEvent;
 import nz.ac.vuw.swen301.assignment3.server.LogsServlet;
 import nz.ac.vuw.swen301.assignment3.server.StatsServlet;
+import org.apache.log4j.Priority;
+import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -74,20 +78,20 @@ public class WhiteBoxTests {
     public void LOGSGETtestReturnedValues() throws IOException {
 
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setParameter("level","DEBUG");
+        request.setParameter("level","ERROR");
         request.addParameter("limit", "5");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         LogsServlet service = new LogsServlet();
+        service.logs.add(new LogEvent("1","test", "11.11.1111", "thread", "logger", "ERROR", "eDets"));
+        service.logs.add(new LogEvent("1","test", "11.11.1111", "thread", "logger", "DEBUG", "eDets"));
+        service.logs.add(new LogEvent("1","test", "11.11.1111", "thread", "logger", "DEBUG", "eDets"));
         service.doGet(request,response);
 
         String result = response.getContentAsString();
-        String[] logs = result.split(" "); //TODO: see what separates logs
-        List<String> list = Arrays.stream(logs).collect(Collectors.toList());
+        System.out.println(result);
+        assertEquals(result, "[{\"id\":\"1\",\"message\":\"test\",\"timestamp\":\"11.11.1111\",\"thread\":\"thread\",\"logger\":\"logger\",\"level\":\"ERROR\",\"errorDetails\":\"eDets\"}]");
 
-        assertTrue(list.get(0).equals("Joshua")); //TODO: Figure out what the logs will be
-        assertTrue(list.get(1).equals("Jason"));
-        assertTrue(list.get(2).equals("Jasmine"));
     }
 
     //LOGS SERVLET POST TESTS
@@ -123,7 +127,7 @@ public class WhiteBoxTests {
                 "  {\n" +
                 "    \"id\": \"d290f1ee-6c54-4b01-90e6-d701748f0851\",\n" +
                 "    \"message\": \"application started\",\n" +
-                "    \"timestamp\": {},\n" +
+                "    \"timestamp\": \"1234\",\n" +
                 "    \"thread\": \"main\",\n" +
                 "    \"logger\": \"com.example.Foo\",\n" +
                 "    \"level\": \"DEBUG\",\n" +
@@ -213,6 +217,8 @@ public class WhiteBoxTests {
     @Test
     public void STATSGETtestReturnedValues() throws IOException {
 
+
+
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setParameter("level","DEBUG");
         request.addParameter("limit", "5");
@@ -225,9 +231,9 @@ public class WhiteBoxTests {
         String[] logs = result.split(" "); //TODO: see what separates logs
         List<String> list = Arrays.stream(logs).collect(Collectors.toList());
 
-        assertTrue(list.get(0).equals("Joshua")); //TODO: Figure out what the logs will be
-        assertTrue(list.get(1).equals("Jason"));
-        assertTrue(list.get(2).equals("Jasmine"));
+        assertTrue(list.get(0).equals(null)); //TODO: Figure out what the logs will be
+        assertTrue(list.get(1).equals(null));
+        assertTrue(list.get(2).equals(null));
     }
 
 }
