@@ -3,6 +3,9 @@ package nz.ac.vuw.swen301.assignment3.server;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.sun.javafx.util.Logging;
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggingEvent;
 
@@ -57,20 +60,26 @@ public class LogsServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response){
         // Stores a log
         response.setContentType("application/json");
-        String logEvent = request.getParameter("LogEvent");
-        if(logEvent == null){
-            response.setStatus(400);
-            return;
-        }
-        Gson gson = new Gson();
-        JsonParser jsonParser = new JsonParser();
-        JsonArray arrayFromString = jsonParser.parse(logEvent).getAsJsonArray();
+        try {
+            HttpEntity entity = new InputStreamEntity(request.getInputStream(), request.getContentLength());
+            String jsonLogs = EntityUtils.toString(entity);
 
-        for(JsonElement json: arrayFromString){
-            logs.add(gson.fromJson(json, LogEvent.class));
-        }
+            if(jsonLogs.equals("")){
+                response.setStatus(400);
+                return;
+            }
+            Gson gson = new Gson();
+            JsonParser jsonParser = new JsonParser();
+            JsonArray arrayFromString = jsonParser.parse(jsonLogs).getAsJsonArray();
 
-        response.setStatus(201);
+            for(JsonElement json: arrayFromString){
+                logs.add(gson.fromJson(json, LogEvent.class));
+            }
+
+            response.setStatus(201);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

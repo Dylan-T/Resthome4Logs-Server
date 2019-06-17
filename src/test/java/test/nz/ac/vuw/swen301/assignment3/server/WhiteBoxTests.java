@@ -1,8 +1,12 @@
 package test.nz.ac.vuw.swen301.assignment3.server;
 
+import com.google.gson.Gson;
 import nz.ac.vuw.swen301.assignment3.server.LogEvent;
 import nz.ac.vuw.swen301.assignment3.server.LogsServlet;
 import nz.ac.vuw.swen301.assignment3.server.StatsServlet;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Test;
@@ -19,24 +23,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class WhiteBoxTests {
-
-    @Test
-    public void devTests(){
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setParameter("LogEvent", "[{\"id\":\"1\",\"message\":\"test\",\"timestamp\":\"11.11.1111\",\"thread\":\"thread\",\"logger\":\"logger\",\"level\":\"ERROR\",\"errorDetails\":\"eDets\"}]");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        LogsServlet service = new LogsServlet();
-        service.doPost(request,response);
-        try {
-            System.out.println(response.getContentAsString());
-            System.out.println(service.logs.get(0).getMessage());
-            System.out.println(service.logs.get(0).getThread());
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-    }
-
 
     //LOGS SERVLET GET TESTS
     @Test
@@ -109,7 +95,7 @@ public class WhiteBoxTests {
 
         String result = response.getContentAsString();
         System.out.println(result);
-        assertEquals(result, "[{\"id\":\"1\",\"message\":\"test\",\"timestamp\":\"11.11.1111\",\"thread\":\"thread\",\"logger\":\"logger\",\"level\":\"ERROR\",\"errorDetails\":\"eDets\"}]");
+        assertEquals("[{\"id\":\"1\",\"message\":\"test\",\"timestamp\":\"11.11.1111\",\"thread\":\"thread\",\"logger\":\"logger\",\"level\":\"ERROR\",\"errorDetails\":\"eDets\"}]", result);
 
     }
 
@@ -155,7 +141,7 @@ public class WhiteBoxTests {
                 "]";
 
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setParameter("LogEvent", logevent);
+        request.setContent(logevent.getBytes());
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         LogsServlet service = new LogsServlet();
@@ -166,20 +152,21 @@ public class WhiteBoxTests {
 
     @Test
     public void LOGSPOSTtestValidContentType() throws IOException {
-        String logevent = "[\n" +
-                "  {\n" +
-                "    \"id\": \"d290f1ee-6c54-4b01-90e6-d701748f0851\",\n" +
-                "    \"message\": \"application started\",\n" +
-                "    \"timestamp\": {},\n" +
-                "    \"thread\": \"main\",\n" +
-                "    \"logger\": \"com.example.Foo\",\n" +
-                "    \"level\": \"DEBUG\",\n" +
-                "    \"errorDetails\": \"string\"\n" +
-                "  }\n" +
+        String logevent = "[" +
+                "  {" +
+                "    \"id\": \"d290f1ee-6c54-4b01-90e6-d701748f0851\"," +
+                "    \"message\": \"application started\"," +
+                "    \"timestamp\": 2141241," +
+                "    \"thread\": \"main\"," +
+                "    \"logger\": \"com.example.Foo\"," +
+                "    \"level\": \"DEBUG\"," +
+                "    \"errorDetails\": \"string\"" +
+                "  }" +
                 "]";
 
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setParameter("LogEvent", logevent);
+        //Create entity
+        request.setContent(logevent.getBytes());
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         LogsServlet service = new LogsServlet();
