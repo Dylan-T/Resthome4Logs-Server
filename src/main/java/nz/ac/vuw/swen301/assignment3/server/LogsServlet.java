@@ -79,7 +79,8 @@ public class LogsServlet extends HttpServlet {
 
             // Add the LogEvents to the logs list
             for(JsonElement json: arrayFromString){
-                logs.add(gson.fromJson(json, LogEvent.class));
+                System.out.println(json.getAsString());
+                logs.add(gson.fromJson(json.getAsString(), LogEvent.class));
             }
 
             response.setStatus(201);
