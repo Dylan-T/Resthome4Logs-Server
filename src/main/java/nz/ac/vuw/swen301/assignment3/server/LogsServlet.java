@@ -31,7 +31,7 @@ public class LogsServlet extends HttpServlet {
             // get logs in order of timestamp
             int counter = 0;
             for (LogEvent log : logs) {
-                if (log.getLevel().toInt() >= Priority.toPriority(level.toUpperCase()).toInt()) {
+                if (Priority.toPriority(level.toUpperCase()).toInt() >= Priority.toPriority(level.toUpperCase()).toInt()) {
                     responseLogs.add(log.toJson());
                     counter++;
                 }

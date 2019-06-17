@@ -47,11 +47,11 @@ public class LogEvent {
         this.logger = logger;
     }
 
-    public Priority getLevel() {
+    public String getLevel() {
         return level;
     }
 
-    public void setLevel(Priority level) {
+    public void setLevel(String level) {
         this.level = level;
     }
 
@@ -68,7 +68,7 @@ public class LogEvent {
     private String timestamp;
     private String thread;
     private String logger;
-    private Priority level;
+    private String level;
     private String errorDetails;
 
     public LogEvent(String id, String message, String timestamp, String thread, String logger, String level, String errorDetails){
@@ -77,7 +77,7 @@ public class LogEvent {
         this.timestamp = timestamp;
         this.thread = thread;
         this.logger = logger;
-        this.level = Priority.toPriority(level);
+        this.level = level;
         this.errorDetails = errorDetails;
     }
 

@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +19,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class WhiteBoxTests {
+
+    @Test
+    public void devTests(){
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setParameter("LogEvent", "[{\"id\":\"1\",\"message\":\"test\",\"timestamp\":\"11.11.1111\",\"thread\":\"thread\",\"logger\":\"logger\",\"level\":\"ERROR\",\"errorDetails\":\"eDets\"}]");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        LogsServlet service = new LogsServlet();
+        service.doPost(request,response);
+        try {
+            System.out.println(response.getContentAsString());
+            System.out.println(service.logs.get(0).getMessage());
+            System.out.println(service.logs.get(0).getThread());
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     //LOGS SERVLET GET TESTS
     @Test
