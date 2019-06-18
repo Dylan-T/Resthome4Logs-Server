@@ -19,8 +19,8 @@ import java.util.*;
 
 public class LogsServlet extends HttpServlet {
 
-    public static List<LogEvent> logs = new ArrayList<LogEvent>();
-    public static Set<String> ids = new HashSet<>();
+    public final static List<LogEvent> logs = new ArrayList<LogEvent>();
+    public final static Set<String> ids = new HashSet<>();
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -70,8 +70,6 @@ public class LogsServlet extends HttpServlet {
             // Read Entity
             HttpEntity entity = new InputStreamEntity(request.getInputStream(), request.getContentLength());
             String jsonLogs = EntityUtils.toString(entity);
-            System.out.println("TEST");
-            System.out.println(jsonLogs);
 
             if(jsonLogs.equals("")){
                 response.setStatus(400);
@@ -92,8 +90,6 @@ public class LogsServlet extends HttpServlet {
                     return;
                 }
                 ids.add(id);
-
-                System.out.println(json.getAsString());
                 logs.add(le);
             }
 

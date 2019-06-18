@@ -91,7 +91,6 @@ public class WhiteBoxTests {
         service.doGet(request,response);
 
         String result = response.getContentAsString();
-        System.out.println(result);
         assertEquals("[{\"id\":\"1\",\"message\":\"test\",\"timestamp\":\"11.11.1111\",\"thread\":\"thread\",\"logger\":\"logger\",\"level\":\"ERROR\",\"errorDetails\":\"eDets\"}]", result);
 
     }
@@ -187,4 +186,45 @@ public class WhiteBoxTests {
         assertEquals(1, LogsServlet.logs.size());
     }
 
+    // STATS GET =======================================================================================================
+    @Test
+    public void STATSGETtestValidBehaviour1() throws IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        StatsServlet service = new StatsServlet();
+        LogsServlet logs = new LogsServlet();
+        logs.logs.add(new LogEvent("id","message","timestamp","thread","logger","level","errordetails"));
+        service.doGet(request,response);
+
+        assertEquals(200, response.getStatus());
+    }
+
+    @Test
+    public void STATSGETtestValidBehaviour2() throws IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        StatsServlet service = new StatsServlet();
+        LogsServlet logs = new LogsServlet();
+        service.doGet(request,response);
+
+        assertEquals("application/vnd.ms-excel", response.getContentType());
+    }
+
+    @Test
+    public void STATSGETtestValidBehaviour3() throws IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        StatsServlet service = new StatsServlet();
+        LogsServlet logs = new LogsServlet();
+        logs.logs.add(new LogEvent("id","message","timestamp","thread","logger","level","errordetails"));
+        service.doGet(request,response);
+
+        assertTrue(response.getContentAsString().length() > 0);
+    }
 }

@@ -88,7 +88,7 @@ public class LogEvent {
         json.addProperty("timestamp", timestamp);
         json.addProperty("thread", thread);
         json.addProperty("logger", logger);
-        json.addProperty("level", level.toString());
+        json.addProperty("level", level);
         json.addProperty("errorDetails", errorDetails);
         return json;
     }

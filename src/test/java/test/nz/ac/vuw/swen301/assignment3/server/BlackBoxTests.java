@@ -1,6 +1,5 @@
 package test.nz.ac.vuw.swen301.assignment3.server;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -12,12 +11,14 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Assume;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -162,7 +163,6 @@ public class BlackBoxTests {
     public void LOGSGETtestReturnedValues () throws Exception {
         Assume.assumeTrue(isServerReady());
         String logevent = "[\"{\\\"id\\\":\\\"7cfffe56-9e30-4f56-a645-855b2561798e\\\",\\\"message\\\":\\\"message1\\\",\\\"timestamp\\\":\\\"18:06:2019\\\",\\\"thread\\\":\\\"main\\\",\\\"logger\\\":\\\"test1\\\",\\\"level\\\":\\\"FATAL\\\",\\\"errorDetails\\\":\\\"\\\"}\"]";
-        System.out.println(logevent);
 
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http").setHost("localhost:8080").setPath("/resthome4logs/logs");
@@ -177,7 +177,6 @@ public class BlackBoxTests {
         StringEntity params = new StringEntity(logevent);
         request.setEntity(params);
         HttpResponse r = httpClient.execute(request);
-        System.out.println(r.getStatusLine().getStatusCode());
 
 
         //build request and set parameters
@@ -197,7 +196,6 @@ public class BlackBoxTests {
         //execute request
         HttpResponse response = httpClient2.execute(request2);
         String logs = EntityUtils.toString(response.getEntity());
-        System.out.println(logs);
         assertEquals("[{\"id\":\"7cfffe56-9e30-4f56-a645-855b2561798e\",\"message\":\"message1\",\"timestamp\":\"18:06:2019\",\"thread\":\"main\",\"logger\":\"test1\",\"level\":\"FATAL\",\"errorDetails\":\"\"}]", logs);
     }
 
@@ -290,7 +288,6 @@ public class BlackBoxTests {
 
         assertNotNull(response.getFirstHeader("Content-Type"));
 
-        // use startsWith instead of assertEquals since server may append char encoding to header value
         assertTrue(response.getFirstHeader("Content-Type").getValue().startsWith("application/vnd.ms-excel"));
     }
 

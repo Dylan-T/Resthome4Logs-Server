@@ -1,23 +1,25 @@
 package nz.ac.vuw.swen301.assignment3.server;
 
-import javafx.scene.layout.Priority;
 import javafx.util.Pair;
+import org.apache.log4j.Level;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.net.URLDecoder;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Level;
 
 public class StatsServlet extends HttpServlet {
 
@@ -27,10 +29,7 @@ public class StatsServlet extends HttpServlet {
 
         List<LogEvent> logs = LogsServlet.logs;
         Map<String, int[]> occurrences = new HashMap<>();
-
         Workbook wb = new HSSFWorkbook();
-        //Workbook wb = new XSSFWorkbook();
-        CreationHelper createHelper = wb.getCreationHelper();
         Sheet sheet = wb.createSheet("new sheet");
 
         //count levels per day
@@ -49,7 +48,12 @@ public class StatsServlet extends HttpServlet {
             int[] levelCount = occurrences.get(log.getTimestamp());
             int level = Level.toLevel(log.getLevel()).toInt() / 10000;
             levelCount[level]++;
+
+
+            List<String> loggerNames = new ArrayList<>();
         }
+
+
 
         //Initialise row headers
         sheet.createRow(0); // Date row
@@ -59,6 +63,10 @@ public class StatsServlet extends HttpServlet {
         sheet.createRow(4).createCell(0).setCellValue("INFO"); // Info
         sheet.createRow(5).createCell(0).setCellValue("DEBUG"); // Debug
         sheet.createRow(6).createCell(0).setCellValue("TRACE"); // Trace
+        sheet.createRow(7).createCell(0).setCellValue("==Loggers==");
+        sheet.createRow(8).createCell(0).setCellValue("test1");
+        sheet.createRow(9).createCell(0).setCellValue("==Threads==");
+        sheet.createRow(10).createCell(0).setCellValue("main");
 
         int r = 6;
         int c = 1;
@@ -70,11 +78,14 @@ public class StatsServlet extends HttpServlet {
 
             // add columns counts
             int[] levels = occurrences.get(date);
+            int sum = 0;
             for(int levelCount: levels){
                 sheet.getRow(r).createCell(c).setCellValue(levelCount);
+                sum += levelCount;
                 r--;
             }
-
+            sheet.getRow(8).createCell(c).setCellValue(sum);
+            sheet.getRow(10).createCell(c).setCellValue(sum);
             //move to next column
             r = 6;
             c++;
@@ -87,7 +98,6 @@ public class StatsServlet extends HttpServlet {
 
         // Decode the file name (might contain spaces and on) and prepare file object.
         File file = new File("workbook.xls");
-        System.out.print(file.toPath());
 
 
 
@@ -100,26 +110,6 @@ public class StatsServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-//        BufferedInputStream input = null;
-//        ServletOutputStream output = null;
-//
-//        try {
-//            // Open streams.
-//            input = new BufferedInputStream(new FileInputStream(file), 10240);
-//            output = response.getOutputStream();
-//
-//            // Write file contents to response.
-//            byte[] buffer = new byte[10240];
-//            int length;
-//            while ((length = input.read(buffer)) > 0) {
-//                output.write(buffer, 0, length);
-//            }
-//        } finally {
-//            // Gently close streams.
-////            input.close();
-////            output.close();
-//            file.delete();
-//        }
         file.delete();
         response.setStatus(200);
     }
