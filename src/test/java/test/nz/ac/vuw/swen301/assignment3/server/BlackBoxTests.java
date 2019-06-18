@@ -1,10 +1,15 @@
 package test.nz.ac.vuw.swen301.assignment3.server;
 
+import com.google.gson.Gson;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.junit.*;
 import java.net.URI;
@@ -27,16 +32,15 @@ public class BlackBoxTests {
     //HELPER METHODS
     @BeforeClass
     public static void startServer() throws Exception {
-//        process = new ProcessBuilder("mvn", "jetty:run").start();
-
-        Runtime.getRuntime().exec("mvn jetty:run");
-        Thread.sleep(3000);
+        //process = new ProcessBuilder("mvn jetty:run").start();
+        process = Runtime.getRuntime().exec("mvn jetty:run");
+        Thread.sleep(10000);
     }
 
     @AfterClass
     public static void stopServer() throws Exception {
-//        process.
-        Runtime.getRuntime().exec("mvn jetty:stop");
+        process.destroy();
+        //Runtime.getRuntime().exec("mvn jetty:stop");
         Thread.sleep(3000);
     }
 
@@ -45,6 +49,21 @@ public class BlackBoxTests {
         HttpGet request = new HttpGet(uri);
         return httpClient.execute(request);
     }
+
+    private HttpResponse post(URI uri, String arg) throws Exception{
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost request = new HttpPost(uri);
+
+        //Create entity
+        if(arg != null) {
+            StringEntity params = new StringEntity(arg);
+            params.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+            request.setEntity(params);
+        }
+
+        return httpClient.execute(request);
+    }
+
 
     private boolean isServerReady() throws Exception {
         URIBuilder builder = new URIBuilder();
@@ -56,19 +75,21 @@ public class BlackBoxTests {
             boolean success = response.getStatusLine().getStatusCode() == 200;
 
             if (!success) {
-                System.err.println("Check whether server is up and running, request to " + uri + " returns " + response.getStatusLine());
+                System.err.println("Check whether server is up and running, request to " + uri
+                        + " returns " + response.getStatusLine());
             }
 
             return success;
         }
         catch (Exception x) {
-            System.err.println("Encountered error connecting to " + uri + " -- check whether server is running and application has been deployed");
+            System.err.println("Encountered error connecting to " + uri
+                    + " -- check whether server is running and application has been deployed");
             return false;
         }
     }
 
 
-    //LOGS GET TESTS
+    // LOGS GET TESTS===================================================================================================
     @Test
     public void LOGSGETtestValidRequestResponseCode () throws Exception {
         Assume.assumeTrue(isServerReady());
@@ -126,23 +147,21 @@ public class BlackBoxTests {
     @Test
     public void LOGSGETtestReturnedValues () throws Exception {
         Assume.assumeTrue(isServerReady());
+        String logevent = "[" +
+                "{\"id\":\"d290f1ee-6c54-4b01-90e6-d701748f0851\",\"message\":\"application started\",\"" +
+                "timestamp\":\"16.6.2019\",\"thread\":\"main\",\"logger\":\"com.example.Foo\"," +
+                "\"level\":\"DEBUG\",\"errorDetails\":\"string\"}]";
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
-                .setParameter("limit","3")
-                .addParameter("level","DEBUG");
+                .addParameter("limit", "1").addParameter("level", "DEBUG");
         URI uri = builder.build();
+        post(uri, logevent);
+
         HttpResponse response = get(uri);
-
-        String content = EntityUtils.toString(response.getEntity());
-        String[] logs = content.split(" "); //TODO: see what separates logs
-        List<String> list = Arrays.stream(logs).collect(Collectors.toList());
-
-        assertTrue(list.get(0).equals("Joshua")); //TODO: Figure out what the logs will be
-        assertTrue(list.get(1).equals("Jason"));
-        assertTrue(list.get(2).equals("Jasmine"));
+        assertEquals(logevent, EntityUtils.toString(response.getEntity()));
     }
 
-    //LOGS POST TESTS
+    // LOGS POST TESTS==================================================================================================
 
     @Test
     public void LOGSPOSTtestValidRequestResponseCode () throws Exception {
@@ -151,7 +170,7 @@ public class BlackBoxTests {
                 "  {\n" +
                 "    \"id\": \"d290f1ee-6c54-4b01-90e6-d701748f0851\",\n" +
                 "    \"message\": \"application started\",\n" +
-                "    \"timestamp\": {},\n" +
+                "    \"timestamp\": \"16.6.2019\",\n" +
                 "    \"thread\": \"main\",\n" +
                 "    \"logger\": \"com.example.Foo\",\n" +
                 "    \"level\": \"DEBUG\",\n" +
@@ -159,10 +178,10 @@ public class BlackBoxTests {
                 "  }\n" +
                 "]";
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
-                .setParameter("LogEvent", logevent);
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH);
         URI uri = builder.build();
-        HttpResponse response = get(uri);
+
+        HttpResponse response = post(uri, logevent);
 
         assertEquals(201,response.getStatusLine().getStatusCode());
     }
@@ -174,7 +193,7 @@ public class BlackBoxTests {
         // query parameter missing
         builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH);
         URI uri = builder.build();
-        HttpResponse response = get(uri);
+        HttpResponse response = post(uri, null);
 
         assertEquals(400,response.getStatusLine().getStatusCode());
     }
@@ -184,10 +203,9 @@ public class BlackBoxTests {
         Assume.assumeTrue(isServerReady());
         URIBuilder builder = new URIBuilder();
         // wrong query parameter name
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
-                .setParameter("invalidkey","J");
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH);
         URI uri = builder.build();
-        HttpResponse response = get(uri);
+        HttpResponse response = post(uri, "hello");
 
         assertEquals(400,response.getStatusLine().getStatusCode());
     }
@@ -199,7 +217,7 @@ public class BlackBoxTests {
                 "  {\n" +
                 "    \"id\": \"d290f1ee-6c54-4b01-90e6-d701748f0851\",\n" +
                 "    \"message\": \"application started\",\n" +
-                "    \"timestamp\": {},\n" +
+                "    \"timestamp\": \"16.6.2019\",\n" +
                 "    \"thread\": \"main\",\n" +
                 "    \"logger\": \"com.example.Foo\",\n" +
                 "    \"level\": \"DEBUG\",\n" +
@@ -207,10 +225,9 @@ public class BlackBoxTests {
                 "  }\n" +
                 "]";
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
-                .setParameter("LogEvent", logevent);
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH);
         URI uri = builder.build();
-        HttpResponse response = get(uri);
+        HttpResponse response = post(uri, logevent);
 
         assertNotNull(response.getFirstHeader("Content-Type"));
 
@@ -218,37 +235,10 @@ public class BlackBoxTests {
         assertTrue(response.getFirstHeader("Content-Type").getValue().startsWith("application/json"));
     }
 
-    @Test
-    public void LOGSPOSTtestReturnedValues () throws Exception {
-        Assume.assumeTrue(isServerReady());
-        String logevent = "[\n" +
-                "  {\n" +
-                "    \"id\": \"d290f1ee-6c54-4b01-90e6-d701748f0851\",\n" +
-                "    \"message\": \"application started\",\n" +
-                "    \"timestamp\": {},\n" +
-                "    \"thread\": \"main\",\n" +
-                "    \"logger\": \"com.example.Foo\",\n" +
-                "    \"level\": \"DEBUG\",\n" +
-                "    \"errorDetails\": \"string\"\n" +
-                "  }\n" +
-                "]";
-        URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
-                .setParameter("LogEvent", logevent);
-        URI uri = builder.build();
-        HttpResponse response = get(uri);
-
-        String content = EntityUtils.toString(response.getEntity());
-        String[] logs = content.split(" "); //TODO: see what separates logs
-        List<String> list = Arrays.stream(logs).collect(Collectors.toList());
-
-        assertTrue(list.get(0).equals("Joshua")); //TODO: Figure out what the logs will be
-        assertTrue(list.get(1).equals("Jason"));
-        assertTrue(list.get(2).equals("Jasmine"));
-    }
 
 
-    //STATS GET TESTS
+
+    // STATS GET TESTS==================================================================================================
     @Test
     public void STATSGETtestValidRequestResponseCode () throws Exception {
         Assume.assumeTrue(isServerReady());
@@ -284,6 +274,6 @@ public class BlackBoxTests {
 
         String content = EntityUtils.toString(response.getEntity());
 
-        assertTrue(content.equals("Joshua")); //TODO: Figure out what will be returned
+        assertTrue(content.length() > 0);
     }
 }

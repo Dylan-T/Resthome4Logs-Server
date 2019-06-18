@@ -16,11 +16,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class LogsServlet extends HttpServlet {
 
     public static List<LogEvent> logs = new ArrayList<LogEvent>();
+    public static Set<String> ids = new HashSet<>();
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -66,8 +69,10 @@ public class LogsServlet extends HttpServlet {
         response.setContentType("application/json");
         try {
             // Read Entity
+
             HttpEntity entity = new InputStreamEntity(request.getInputStream(), request.getContentLength());
             String jsonLogs = EntityUtils.toString(entity);
+
 
             if(jsonLogs.equals("")){
                 response.setStatus(400);
@@ -82,13 +87,20 @@ public class LogsServlet extends HttpServlet {
             // Add the LogEvents to the logs list
             for(JsonElement json: arrayFromString){
                 if(!json.isJsonNull()) {
+
+                    String id = json.getAsJsonObject().get("id").toString();
+                    if(ids.contains(id)){
+                        response.setStatus(409);
+                        return;
+                    }
+                    ids.add(id);
                     logs.add(gson.fromJson(json.toString(), LogEvent.class));
                 }
             }
 
             response.setStatus(201);
-        } catch (IOException e) {
-            e.printStackTrace();
+        }catch(Exception e) {
+            response.setStatus(400);
         }
     }
 
