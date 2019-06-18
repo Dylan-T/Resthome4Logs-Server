@@ -1,6 +1,7 @@
 package test.nz.ac.vuw.swen301.assignment3.server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -13,6 +14,7 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.junit.*;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +32,18 @@ public class BlackBoxTests {
     static Process process;
 
     //HELPER METHODS
+
+    private JsonObject getJsonLog(){
+        JsonObject json = new JsonObject();
+        json.addProperty("id", "123");
+        json.addProperty("timestamp", "16:06:2019");
+        json.addProperty("thread", "main");
+        json.addProperty("logger", "testLogger");
+        json.addProperty("level", "DEBUG");
+        json.addProperty("errorDetails", "string");
+        return json;
+    }
+
     @BeforeClass
     public static void startServer() throws Exception {
         //process = new ProcessBuilder("mvn jetty:run").start();
@@ -147,18 +161,44 @@ public class BlackBoxTests {
     @Test
     public void LOGSGETtestReturnedValues () throws Exception {
         Assume.assumeTrue(isServerReady());
-        String logevent = "[" +
-                "{\"id\":\"d290f1ee-6c54-4b01-90e6-d701748f0851\",\"message\":\"application started\",\"" +
-                "timestamp\":\"16.6.2019\",\"thread\":\"main\",\"logger\":\"com.example.Foo\"," +
-                "\"level\":\"DEBUG\",\"errorDetails\":\"string\"}]";
-        URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
-                .addParameter("limit", "1").addParameter("level", "DEBUG");
-        URI uri = builder.build();
-        post(uri, logevent);
+        String logevent = "[\"{\\\"id\\\":\\\"7cfffe56-9e30-4f56-a645-855b2561798e\\\",\\\"message\\\":\\\"message1\\\",\\\"timestamp\\\":\\\"18:06:2019\\\",\\\"thread\\\":\\\"main\\\",\\\"logger\\\":\\\"test1\\\",\\\"level\\\":\\\"FATAL\\\",\\\"errorDetails\\\":\\\"\\\"}\"]";
+        System.out.println(logevent);
 
-        HttpResponse response = get(uri);
-        assertEquals(logevent, EntityUtils.toString(response.getEntity()));
+        URIBuilder builder = new URIBuilder();
+        builder.setScheme("http").setHost("localhost:8080").setPath("/resthome4logs/logs");
+        URI uri = builder.build();
+
+        // create and execute the request
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost request = new HttpPost(uri);
+        request.addHeader("content-type", "application/json");
+
+        //Create entity
+        StringEntity params = new StringEntity(logevent);
+        request.setEntity(params);
+        HttpResponse r = httpClient.execute(request);
+        System.out.println(r.getStatusLine().getStatusCode());
+
+
+        //build request and set parameters
+        URIBuilder builder2 = new URIBuilder();
+        builder2.setScheme("http").setHost("localhost:8080").setPath("/resthome4logs/logs")
+                .addParameter("limit", ""+3)
+                .addParameter("level", "FATAL");
+        URI uri2 = null;
+        try {
+            uri2 = builder2.build();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        HttpClient httpClient2 = HttpClientBuilder.create().build();
+        HttpGet request2 = new HttpGet(uri2);
+
+        //execute request
+        HttpResponse response = httpClient2.execute(request2);
+        String logs = EntityUtils.toString(response.getEntity());
+        System.out.println(logs);
+        assertEquals("[{\"id\":\"7cfffe56-9e30-4f56-a645-855b2561798e\",\"message\":\"message1\",\"timestamp\":\"18:06:2019\",\"thread\":\"main\",\"logger\":\"test1\",\"level\":\"FATAL\",\"errorDetails\":\"\"}]", logs);
     }
 
     // LOGS POST TESTS==================================================================================================
@@ -166,17 +206,7 @@ public class BlackBoxTests {
     @Test
     public void LOGSPOSTtestValidRequestResponseCode () throws Exception {
         Assume.assumeTrue(isServerReady());
-        String logevent = "[\n" +
-                "  {\n" +
-                "    \"id\": \"d290f1ee-6c54-4b01-90e6-d701748f0851\",\n" +
-                "    \"message\": \"application started\",\n" +
-                "    \"timestamp\": \"16.6.2019\",\n" +
-                "    \"thread\": \"main\",\n" +
-                "    \"logger\": \"com.example.Foo\",\n" +
-                "    \"level\": \"DEBUG\",\n" +
-                "    \"errorDetails\": \"string\"\n" +
-                "  }\n" +
-                "]";
+        String logevent = "[\"{\\\"id\\\":\\\"bde128b4-e07b-44be-ad30-0971d970b757\\\",\\\"message\\\":\\\"message2\\\",\\\"timestamp\\\":\\\"18:06:2019\\\",\\\"thread\\\":\\\"main\\\",\\\"logger\\\":\\\"test1\\\",\\\"level\\\":\\\"ERROR\\\",\\\"errorDetails\\\":\\\"\\\"}\",\"{\\\"id\\\":\\\"25729e67-0ad9-44a8-a5ad-d7cf0b5b04da\\\",\\\"message\\\":\\\"message1\\\",\\\"timestamp\\\":\\\"18:06:2019\\\",\\\"thread\\\":\\\"main\\\",\\\"logger\\\":\\\"test1\\\",\\\"level\\\":\\\"ERROR\\\",\\\"errorDetails\\\":\\\"\\\"}\"]";
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH);
         URI uri = builder.build();
@@ -213,16 +243,16 @@ public class BlackBoxTests {
     @Test
     public void LOGSPOSTtestValidContentType () throws Exception {
         Assume.assumeTrue(isServerReady());
-        String logevent = "[\n" +
-                "  {\n" +
-                "    \"id\": \"d290f1ee-6c54-4b01-90e6-d701748f0851\",\n" +
-                "    \"message\": \"application started\",\n" +
-                "    \"timestamp\": \"16.6.2019\",\n" +
-                "    \"thread\": \"main\",\n" +
-                "    \"logger\": \"com.example.Foo\",\n" +
-                "    \"level\": \"DEBUG\",\n" +
-                "    \"errorDetails\": \"string\"\n" +
-                "  }\n" +
+        String logevent = "[" +
+                "  {" +
+                "    \"id\": \"d290f1ee-6c54-4b01-90e6-d701748f0851\"," +
+                "    \"message\": \"application started\"," +
+                "    \"timestamp\": \"16.6.2019\"," +
+                "    \"thread\": \"main\"," +
+                "    \"logger\": \"com.example.Foo\"," +
+                "    \"level\": \"DEBUG\"," +
+                "    \"errorDetails\": \"string\"" +
+                "  }" +
                 "]";
         URIBuilder builder = new URIBuilder();
         builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH);

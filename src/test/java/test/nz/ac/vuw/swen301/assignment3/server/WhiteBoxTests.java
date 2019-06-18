@@ -123,17 +123,7 @@ public class WhiteBoxTests {
     @Test
     public void LOGSPOSTtestInvalidRequestResponseCode3() throws IOException {
         // TEST DUPLICATE ID RESPONSE CODE
-        String logevent = "[\n" +
-                "  {\n" +
-                "    \"id\": \"d290f1ee-6c54-4b01-90e6-d701748f0851\",\n" +
-                "    \"message\": \"application started\",\n" +
-                "    \"timestamp\": \"1234\",\n" +
-                "    \"thread\": \"main\",\n" +
-                "    \"logger\": \"com.example.Foo\",\n" +
-                "    \"level\": \"DEBUG\",\n" +
-                "    \"errorDetails\": \"string\"\n" +
-                "  }\n" +
-                "]";
+        String logevent = "[\"{\\\"id\\\":\\\"7cfffe56-9e30-4f56-a645-855b2561798e\\\",\\\"message\\\":\\\"message1\\\",\\\"timestamp\\\":\\\"18:06:2019\\\",\\\"thread\\\":\\\"main\\\",\\\"logger\\\":\\\"test1\\\",\\\"level\\\":\\\"FATAL\\\",\\\"errorDetails\\\":\\\"\\\"}\"]";
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setContent(logevent.getBytes());
 
@@ -151,17 +141,7 @@ public class WhiteBoxTests {
     @Test
     public void LOGSPOSTtestValidRequestResponseCode() throws IOException {
         // TEST SUCCESSFUL POST RESPONSE CODE
-        String logevent = "[\n" +
-                "  {\n" +
-                "    \"id\": \"d290f1ee-6c54-4b01-90e6-d701748f0851\",\n" +
-                "    \"message\": \"application started\",\n" +
-                "    \"timestamp\": \"1234\",\n" +
-                "    \"thread\": \"main\",\n" +
-                "    \"logger\": \"com.example.Foo\",\n" +
-                "    \"level\": \"DEBUG\",\n" +
-                "    \"errorDetails\": \"string\"\n" +
-                "  }\n" +
-                "]";
+        String logevent = "[\"{\\\"id\\\":\\\"7cfffe56-9e30-4f56-a645-855b2561798e\\\",\\\"message\\\":\\\"message1\\\",\\\"timestamp\\\":\\\"18:06:2019\\\",\\\"thread\\\":\\\"main\\\",\\\"logger\\\":\\\"test1\\\",\\\"level\\\":\\\"FATAL\\\",\\\"errorDetails\\\":\\\"\\\"}\"]";
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setContent(logevent.getBytes());
@@ -176,17 +156,7 @@ public class WhiteBoxTests {
     @Test
     public void LOGSPOSTtestValidContentType() throws IOException {
         // TEST VALID CASE CONTENT TYPE
-        String logevent = "[" +
-                "  {" +
-                "    \"id\": \"d290f1ee-6c54-4b01-90e6-d701748f0851\"," +
-                "    \"message\": \"application started\"," +
-                "    \"timestamp\": 2141241," +
-                "    \"thread\": \"main\"," +
-                "    \"logger\": \"com.example.Foo\"," +
-                "    \"level\": \"DEBUG\"," +
-                "    \"errorDetails\": \"string\"" +
-                "  }" +
-                "]";
+        String logevent = "[\"{\\\"id\\\":\\\"7cfffe56-9e30-4f56-a645-855b2561798e\\\",\\\"message\\\":\\\"message1\\\",\\\"timestamp\\\":\\\"18:06:2019\\\",\\\"thread\\\":\\\"main\\\",\\\"logger\\\":\\\"test1\\\",\\\"level\\\":\\\"FATAL\\\",\\\"errorDetails\\\":\\\"\\\"}\"]";
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         //Create entity
@@ -202,17 +172,8 @@ public class WhiteBoxTests {
     @Test
     public void LOGSPOSTtestValidBehaviour() throws IOException {
         // TEST VALID CASE PUTS LOG INTO SERVLET
-        String logevent = "[" +
-                "  {" +
-                "    \"id\": \"d290f1ee-6c54-4b01-90e6-d701748f0851\"," +
-                "    \"message\": \"application started\"," +
-                "    \"timestamp\": 2141241," +
-                "    \"thread\": \"main\"," +
-                "    \"logger\": \"com.example.Foo\"," +
-                "    \"level\": \"DEBUG\"," +
-                "    \"errorDetails\": \"string\"" +
-                "  }" +
-                "]";
+        String logevent = "[\"{\\\"id\\\":\\\"7cfffe56-9e30-4f56-a645-855b2561798e\\\",\\\"message\\\":\\\"message1\\\",\\\"timestamp\\\":\\\"18:06:2019\\\",\\\"thread\\\":\\\"main\\\",\\\"logger\\\":\\\"test1\\\",\\\"level\\\":\\\"FATAL\\\",\\\"errorDetails\\\":\\\"\\\"}\"]";
+
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         //Create entity

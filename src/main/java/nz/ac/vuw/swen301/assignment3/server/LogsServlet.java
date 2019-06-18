@@ -15,10 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class LogsServlet extends HttpServlet {
 
@@ -41,11 +38,10 @@ public class LogsServlet extends HttpServlet {
 
             // Iterate backwards to get them newest to oldest
             int counter = 0;
-            for (LogEvent log : logs) {
+            for (int i = logs.size()-1; i >= 0; i--) {
                 //add only if level is right
-                System.out.println();
-                if (Level.toLevel(log.getLevel()).toInt() >= Level.toLevel(level).toInt()) {
-                    responseLogs.add(log.toJson());
+                if (Level.toLevel(logs.get(i).getLevel()).toInt() >= Level.toLevel(level).toInt()) {
+                    responseLogs.add(logs.get(i).toJson());
                     counter++;
                 }
                 if (counter == limit) break; //Stop once limit is reached
@@ -66,13 +62,16 @@ public class LogsServlet extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response){
         // Stores a log
-        response.setContentType("application/json");
-        try {
-            // Read Entity
 
+        try {
+            request.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json");
+
+            // Read Entity
             HttpEntity entity = new InputStreamEntity(request.getInputStream(), request.getContentLength());
             String jsonLogs = EntityUtils.toString(entity);
-
+            System.out.println("TEST");
+            System.out.println(jsonLogs);
 
             if(jsonLogs.equals("")){
                 response.setStatus(400);
@@ -86,21 +85,22 @@ public class LogsServlet extends HttpServlet {
 
             // Add the LogEvents to the logs list
             for(JsonElement json: arrayFromString){
-                if(!json.isJsonNull()) {
-
-                    String id = json.getAsJsonObject().get("id").toString();
-                    if(ids.contains(id)){
-                        response.setStatus(409);
-                        return;
-                    }
-                    ids.add(id);
-                    logs.add(gson.fromJson(json.toString(), LogEvent.class));
+                LogEvent le = gson.fromJson(json.getAsString(), LogEvent.class);
+                String id = le.getId();
+                if(ids.contains(id)){
+                    response.setStatus(409);
+                    return;
                 }
+                ids.add(id);
+
+                System.out.println(json.getAsString());
+                logs.add(le);
             }
 
             response.setStatus(201);
-        }catch(Exception e) {
+        } catch (Exception e) {
             response.setStatus(400);
+            e.printStackTrace();
         }
     }
 
