@@ -6,6 +6,7 @@ import com.sun.javafx.util.Logging;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Level;
 import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggingEvent;
 
@@ -39,7 +40,8 @@ public class LogsServlet extends HttpServlet {
             int counter = 0;
             for (LogEvent log : logs) {
                 //add only if level is right
-                if (Priority.toPriority(level.toUpperCase()).toInt() >= Priority.toPriority(level.toUpperCase()).toInt()) {
+                System.out.println();
+                if (Level.toLevel(log.getLevel()).toInt() >= Level.toLevel(level).toInt()) {
                     responseLogs.add(log.toJson());
                     counter++;
                 }
@@ -79,8 +81,9 @@ public class LogsServlet extends HttpServlet {
 
             // Add the LogEvents to the logs list
             for(JsonElement json: arrayFromString){
-                System.out.println(json.getAsString());
-                logs.add(gson.fromJson(json.getAsString(), LogEvent.class));
+                if(!json.isJsonNull()) {
+                    logs.add(gson.fromJson(json.toString(), LogEvent.class));
+                }
             }
 
             response.setStatus(201);

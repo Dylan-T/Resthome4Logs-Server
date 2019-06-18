@@ -187,10 +187,8 @@ public class WhiteBoxTests {
         service.doPost(request,response);
 
         String result = response.getContentAsString();
-        String[] logs = result.split(" ");
-        List<String> list = Arrays.stream(logs).collect(Collectors.toList());
 
-        assertTrue(list.get(0).equals("Joshua")); //TODO: Figure out what POST returns
+        assertEquals("items created", result);
     }
 
 

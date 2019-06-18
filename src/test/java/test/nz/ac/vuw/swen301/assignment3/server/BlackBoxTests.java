@@ -22,15 +22,20 @@ public class BlackBoxTests {
     private static final String LOGS_PATH = TEST_PATH + "/logs"; // as defined in pom.xml and web.xml
     private static final String STATS_PATH = TEST_PATH + "/stats";
 
+    static Process process;
+
     //HELPER METHODS
     @BeforeClass
     public static void startServer() throws Exception {
+//        process = new ProcessBuilder("mvn", "jetty:run").start();
+
         Runtime.getRuntime().exec("mvn jetty:run");
         Thread.sleep(3000);
     }
 
     @AfterClass
     public static void stopServer() throws Exception {
+//        process.
         Runtime.getRuntime().exec("mvn jetty:stop");
         Thread.sleep(3000);
     }
@@ -43,7 +48,8 @@ public class BlackBoxTests {
 
     private boolean isServerReady() throws Exception {
         URIBuilder builder = new URIBuilder();
-        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(TEST_PATH);
+        builder.setScheme("http").setHost(TEST_HOST).setPort(TEST_PORT).setPath(LOGS_PATH)
+                .addParameter("level","WARN").addParameter("limit", "25");
         URI uri = builder.build();
         try {
             HttpResponse response = get(uri);
